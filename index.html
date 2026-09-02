@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Aplicación de test estática y sin distracciones para estudiar oposiciones. Ligera, rápida y adaptable a modo claro/oscuro.">
+  <title>PrepOpos - Test de Oposiciones</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Iconos simples vía SVG inline o Lucide/Heroicons -->
+</head>
+<body>
+
+  <!-- Cabecera de la Aplicación -->
+  <header class="app-header">
+    <a href="#" class="brand" id="brand-link" aria-label="Ir al inicio">
+      <div class="brand-icon">✓</div>
+      <div>
+        <h1 class="brand-title">PrepOpos</h1>
+        <p class="brand-subtitle">Test de Oposiciones</p>
+      </div>
+    </a>
+    
+    <!-- Botón de Cambio de Tema (Claro/Oscuro) -->
+    <button id="theme-toggle" class="theme-toggle-btn" aria-label="Cambiar tema de color">
+      <span id="theme-toggle-icon">🌙</span>
+      <span id="theme-toggle-text">Modo Oscuro</span>
+    </button>
+  </header>
+
+  <!-- Contenedor Principal -->
+  <main class="main-container">
+
+    <!-- ====================================================================
+         PANTALLA 1: CONFIGURACIÓN E INICIO
+         ==================================================================== -->
+    <section id="config-screen" class="screen card active">
+      <div class="config-header">
+        <h2 class="config-title">Configura tu Test</h2>
+        <p class="config-description">Elige la materia y el formato que prefieras para comenzar tu sesión de estudio.</p>
+      </div>
+
+      <!-- Barra de Estadísticas Generales -->
+      <div class="stats-bar">
+        <div class="stat-item">
+          <div id="stat-total-tests" class="stat-value">0</div>
+          <div class="stat-label">Tests Realizados</div>
+        </div>
+        <div class="stat-item">
+          <div id="stat-avg-score" class="stat-value">0%</div>
+          <div class="stat-label">Promedio Aciertos</div>
+        </div>
+        <div class="stat-item">
+          <div id="stat-available-q" class="stat-value">0</div>
+          <div class="stat-label">Preguntas Disponibles</div>
+        </div>
+      </div>
+
+      <form id="config-form" onsubmit="event.preventDefault();">
+        <div class="form-grid">
+          
+          <!-- Selector de Tema -->
+          <div class="form-group">
+            <label for="select-tema" class="form-label">
+              <span>📚 Tema o Materia</span>
+            </label>
+            <select id="select-tema" class="select-custom">
+              <option value="ALL">Cargando temas...</option>
+            </select>
+          </div>
+
+          <!-- Selector de Orden -->
+          <div class="form-group">
+            <label for="select-orden" class="form-label">
+              <span>🔀 Orden de las preguntas</span>
+            </label>
+            <select id="select-orden" class="select-custom">
+              <option value="random">Aleatorio (Barajar preguntas)</option>
+              <option value="sequential">En orden secuencial</option>
+            </select>
+          </div>
+
+          <!-- Selector de Cantidad de Preguntas -->
+          <div class="form-group">
+            <label for="select-cantidad" class="form-label">
+              <span>🔢 Número de preguntas</span>
+            </label>
+            <select id="select-cantidad" class="select-custom">
+              <option value="ALL">Todas las preguntas disponibles</option>
+              <option value="5">5 preguntas (Test rápido)</option>
+              <option value="10">10 preguntas</option>
+              <option value="20">20 preguntas</option>
+            </select>
+          </div>
+
+        </div>
+
+        <button type="button" id="btn-start" class="btn btn-primary">
+          <span>🚀 Empezar Test</span>
+        </button>
+      </form>
+    </section>
+
+
+    <!-- ====================================================================
+         PANTALLA 2: REALIZACIÓN DEL TEST
+         ==================================================================== -->
+    <section id="test-screen" class="screen card">
+      <!-- Barra Superior de Navegación del Test -->
+      <div class="test-top-bar">
+        <span id="test-topic-badge" class="topic-badge">Tema</span>
+        <button id="btn-quit-test" class="btn-quit" title="Abandonar el test">✕ Cancelar</button>
+      </div>
+
+      <!-- Barra de Progreso -->
+      <div class="progress-container">
+        <div class="progress-info">
+          <span id="progress-text">Pregunta 1 de 10</span>
+          <span id="progress-percentage">10%</span>
+        </div>
+        <div class="progress-track">
+          <div id="progress-fill" class="progress-fill"></div>
+        </div>
+      </div>
+
+      <!-- Texto de la Pregunta -->
+      <h2 id="question-text" class="question-text">Cargando pregunta...</h2>
+
+      <!-- Rejilla de Opciones (A, B, C, D) -->
+      <div id="options-grid" class="options-grid">
+        <!-- Generado dinámicamente mediante JS -->
+      </div>
+
+      <!-- Cuadro de Explicación de la Respuesta -->
+      <div id="explanation-box" class="explanation-box">
+        <div class="explanation-title">💡 Explicación del artículo / norma:</div>
+        <p id="explanation-text" class="explanation-text"></p>
+      </div>
+
+      <!-- Acciones (Botón Siguiente) -->
+      <div class="test-actions">
+        <button id="btn-next-question" class="btn btn-primary btn-next">
+          <span>Siguiente Pregunta ➔</span>
+        </button>
+      </div>
+    </section>
+
+
+    <!-- ====================================================================
+         PANTALLA 3: RESULTADOS DEL TEST
+         ==================================================================== -->
+    <section id="results-screen" class="screen card">
+      <div class="results-header">
+        <div id="results-icon" class="results-icon">🎯</div>
+        <h2 id="results-title" class="results-title">¡Test Completado!</h2>
+        <p id="results-subtitle" class="results-subtitle">Aquí tienes el resumen de tu rendimiento.</p>
+      </div>
+
+      <!-- Resumen de Puntuación -->
+      <div class="results-score-card">
+        <div id="results-percentage" class="percentage-badge">0%</div>
+        <div class="score-stats">
+          <div class="score-stat-item">
+            <div id="results-correct-count" class="score-stat-number correct">0</div>
+            <div class="score-stat-label">Aciertos</div>
+          </div>
+          <div class="score-stat-item">
+            <div id="results-incorrect-count" class="score-stat-number incorrect">0</div>
+            <div class="score-stat-label">Fallos</div>
+          </div>
+          <div class="score-stat-item">
+            <div id="results-total-count" class="score-stat-number">0</div>
+            <div class="score-stat-label">Total</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Desglose y Revisión de Respuestas -->
+      <div class="review-section">
+        <div class="review-title-bar">
+          <h3 class="review-title">Revisión de Preguntas</h3>
+          <div class="filter-buttons">
+            <button class="filter-btn active" data-filter="all">Todas</button>
+            <button class="filter-btn" data-filter="incorrect">Solo fallos</button>
+            <button class="filter-btn" data-filter="correct">Solo aciertos</button>
+          </div>
+        </div>
+
+        <div id="review-list" class="review-list">
+          <!-- Generado dinámicamente mediante JS -->
+        </div>
+      </div>
+
+      <!-- Acciones de Finalización -->
+      <div class="results-actions">
+        <button id="btn-restart-same" class="btn btn-secondary">
+          <span>🔄 Repetir este test</span>
+        </button>
+        <button id="btn-go-config" class="btn btn-primary">
+          <span>⚙️ Nuevo Test</span>
+        </button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Pie de Página -->
+  <footer class="app-footer">
+    <p>PrepOpos &bull; Aplicación Ligera para Estudio de Oposiciones &bull; Sin Backend</p>
+  </footer>
+
+  <!-- Carga de Scripts JS (Primero los datos, después la lógica de la app) -->
+  <script src="preguntas.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
