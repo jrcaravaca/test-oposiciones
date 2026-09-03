@@ -40,6 +40,11 @@ document.addEventListener('DOMContentLoaded', () => {
     selectTema: document.getElementById('select-tema'),
     selectOrden: document.getElementById('select-orden'),
     selectCantidad: document.getElementById('select-cantidad'),
+    groupCantidadAll: document.getElementById('group-cantidad-all'),
+    groupRangoTema: document.getElementById('group-rango-tema'),
+    inputDesde: document.getElementById('input-desde'),
+    inputHasta: document.getElementById('input-hasta'),
+    rangeInfoText: document.getElementById('range-info-text'),
     btnStart: document.getElementById('btn-start'),
     statTotalTests: document.getElementById('stat-total-tests'),
     statAvgScore: document.getElementById('stat-avg-score'),
@@ -76,6 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initTheme();
     loadTopicsIntoSelect();
     updateConfigStats();
+    updateFormUIForTopic();
     attachEventListeners();
   }
 
@@ -139,6 +145,35 @@ document.addEventListener('DOMContentLoaded', () => {
     DOM.selectTema.innerHTML = html;
   }
 
+  function updateFormUIForTopic() {
+    const selectedTopic = DOM.selectTema.value;
+
+    if (selectedTopic === 'ALL') {
+      DOM.groupCantidadAll.style.display = 'flex';
+      DOM.groupRangoTema.style.display = 'none';
+    } else {
+      DOM.groupCantidadAll.style.display = 'none';
+      DOM.groupRangoTema.style.display = 'flex';
+
+      const topicQuestions = state.allQuestions.filter(q => q.tema === selectedTopic);
+      const totalCount = topicQuestions.length;
+
+      if (totalCount > 0) {
+        DOM.inputDesde.min = 1;
+        DOM.inputDesde.max = totalCount;
+        DOM.inputDesde.value = 1;
+
+        DOM.inputHasta.min = 1;
+        DOM.inputHasta.max = totalCount;
+        DOM.inputHasta.value = totalCount;
+
+        DOM.rangeInfoText.textContent = `💡 Este tema contiene ${totalCount} preguntas disponibles (del 1 al ${totalCount}).`;
+      } else {
+        DOM.rangeInfoText.textContent = 'No hay preguntas disponibles para este tema.';
+      }
+    }
+  }
+
   function updateConfigStats() {
     const statsHistory = JSON.parse(localStorage.getItem('prepOpos_history') || '[]');
     if (statsHistory.length === 0) {
@@ -180,31 +215,59 @@ document.addEventListener('DOMContentLoaded', () => {
   function startTest() {
     state.selectedTema = DOM.selectTema.value;
     state.selectedOrden = DOM.selectOrden.value;
-    state.selectedCantidad = DOM.selectCantidad.value;
 
-    // Filtrar por tema
-    let pool = state.allQuestions;
-    if (state.selectedTema !== 'ALL') {
-      pool = state.allQuestions.filter(q => q.tema === state.selectedTema);
-    }
+    let pool = [];
 
-    if (pool.length === 0) {
-      alert('No hay preguntas disponibles para el tema seleccionado.');
-      return;
-    }
+    if (state.selectedTema === 'ALL') {
+      pool = [...state.allQuestions];
 
-    // Ordenar / Barajar
-    if (state.selectedOrden === 'random') {
-      pool = shuffleArray(pool);
+      if (pool.length === 0) {
+        alert('No hay preguntas disponibles.');
+        return;
+      }
+
+      if (state.selectedOrden === 'random') {
+        pool = shuffleArray(pool);
+      }
+
+      // Aplicar límite máximo de 200 preguntas para Todos los temas mezclados
+      let limit = 200;
+      const selectedCant = DOM.selectCantidad.value;
+      if (selectedCant !== 'MAX_200') {
+        const parsed = parseInt(selectedCant, 10);
+        if (!isNaN(parsed) && parsed > 0) {
+          limit = Math.min(parsed, 200);
+        }
+      }
+
+      pool = pool.slice(0, limit);
+
     } else {
-      pool = [...pool]; // Copia secuencial
-    }
+      const topicQuestions = state.allQuestions.filter(q => q.tema === state.selectedTema);
+      const total = topicQuestions.length;
 
-    // Recortar cantidad si aplica
-    if (state.selectedCantidad !== 'ALL') {
-      const limit = parseInt(state.selectedCantidad, 10);
-      if (!isNaN(limit) && limit > 0) {
-        pool = pool.slice(0, limit);
+      if (total === 0) {
+        alert('No hay preguntas disponibles para el tema seleccionado.');
+        return;
+      }
+
+      let desde = parseInt(DOM.inputDesde.value, 10);
+      let hasta = parseInt(DOM.inputHasta.value, 10);
+
+      if (isNaN(desde) || desde < 1) desde = 1;
+      if (isNaN(hasta) || hasta > total) hasta = total;
+
+      if (desde > hasta) {
+        alert(`La pregunta "Desde" (${desde}) no puede ser mayor que "Hasta" (${hasta}).`);
+        return;
+      }
+
+      // Recortar rango elegido (1-based a slice 0-based)
+      pool = topicQuestions.slice(desde - 1, hasta);
+
+      // Si es aleatorio, barajar las preguntas del rango seleccionado
+      if (state.selectedOrden === 'random') {
+        pool = shuffleArray(pool);
       }
     }
 
@@ -436,8 +499,11 @@ document.addEventListener('DOMContentLoaded', () => {
   // 10. EVENT LISTENERS
   // ------------------------------------------------------------------
   function attachEventListeners() {
-    // Cambio de Tema
+    // Cambio de Tema de Color
     DOM.themeToggle.addEventListener('click', toggleTheme);
+
+    // Cambio de Selección de Tema/Materia
+    DOM.selectTema.addEventListener('change', updateFormUIForTopic);
 
     // Botón Empezar Test
     DOM.btnStart.addEventListener('click', startTest);

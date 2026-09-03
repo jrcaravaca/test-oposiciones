@@ -79,17 +79,40 @@
             </select>
           </div>
 
-          <!-- Selector de Cantidad de Preguntas -->
-          <div class="form-group">
+          <!-- Selector de Cantidad (para "Todos los temas mezclados") -->
+          <div id="group-cantidad-all" class="form-group">
             <label for="select-cantidad" class="form-label">
-              <span>🔢 Número de preguntas</span>
+              <span>🔢 Número de preguntas (Máximo 200)</span>
             </label>
             <select id="select-cantidad" class="select-custom">
-              <option value="ALL">Todas las preguntas disponibles</option>
+              <option value="20">20 preguntas (Predeterminado)</option>
               <option value="5">5 preguntas (Test rápido)</option>
               <option value="10">10 preguntas</option>
-              <option value="20">20 preguntas</option>
+              <option value="50">50 preguntas</option>
+              <option value="100">100 preguntas</option>
+              <option value="200">200 preguntas (Máximo)</option>
+              <option value="MAX_200">Todas las disponibles (máx 200)</option>
             </select>
+          </div>
+
+          <!-- Selector de Rango de Preguntas (para un tema específico) -->
+          <div id="group-rango-tema" class="form-group" style="display: none;">
+            <label class="form-label">
+              <span>🎯 Rango de preguntas del tema</span>
+            </label>
+            <div class="range-inputs-flex">
+              <div>
+                <label for="input-desde" class="form-hint">Desde la nº:</label>
+                <input type="number" id="input-desde" class="input-custom" min="1" value="1">
+              </div>
+              <div>
+                <label for="input-hasta" class="form-hint">Hasta la nº:</label>
+                <input type="number" id="input-hasta" class="input-custom" min="1" value="50">
+              </div>
+            </div>
+            <p id="range-info-text" class="form-hint-info">
+              Cargando preguntas disponibles...
+            </p>
           </div>
 
         </div>
@@ -202,9 +225,7 @@
     <p>PrepOpos &bull; Aplicación Ligera para Estudio de Oposiciones &bull; Sin Backend</p>
   </footer>
 
-  <!-- Carga de Scripts JS (Primero el registro, luego los archivos de cada tema, y finalmente la app) -->
-  <script src="preguntas.js"></script>
-  
+  <!-- Carga de Scripts JS (Archivos de cada tema y lógica de la app) -->
   <!-- Temas de preguntas (Añade aquí un script por cada nuevo tema) -->
   <script src="preguntas/tema13.js"></script>
   <!-- <script src="preguntas/tema01.js"></script> -->
