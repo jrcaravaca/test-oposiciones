@@ -53,8 +53,6 @@ document.addEventListener('DOMContentLoaded', () => {
     progressFill: document.getElementById('progress-fill'),
     questionText: document.getElementById('question-text'),
     optionsGrid: document.getElementById('options-grid'),
-    explanationBox: document.getElementById('explanation-box'),
-    explanationText: document.getElementById('explanation-text'),
     btnNextQuestion: document.getElementById('btn-next-question'),
 
     // Pantalla Resultados
@@ -256,9 +254,7 @@ document.addEventListener('DOMContentLoaded', () => {
       DOM.optionsGrid.appendChild(btn);
     });
 
-    // Reset de explicación y botón Siguiente
-    DOM.explanationBox.classList.remove('visible');
-    DOM.explanationText.textContent = '';
+    // Reset de botón Siguiente
     DOM.btnNextQuestion.classList.remove('visible');
 
     // Cambiar texto del botón en la última pregunta
@@ -304,11 +300,8 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    // Mostrar Explicación si existe
-    if (currentQ.explicacion && currentQ.explicacion.trim() !== '') {
-      DOM.explanationText.textContent = currentQ.explicacion;
-      DOM.explanationBox.classList.add('visible');
-    }
+    // No mostrar la explicación del artículo al responder durante el test
+    // (La explicación sólo estará disponible en la pantalla de revisión final)
 
     // Mostrar el botón de Siguiente Pregunta
     DOM.btnNextQuestion.classList.add('visible');
@@ -421,10 +414,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (!item.isCorrect) {
         content += `<div><strong>Respuesta correcta:</strong> (${correctLetter}) ${escapeHtml(q.opciones[q.respuestaCorrecta])}</div>`;
-      }
-
-      if (q.explicacion && q.explicacion.trim() !== '') {
-        content += `<div style="margin-top: 0.4rem; color: var(--accent-primary); font-size: 0.85rem;"><strong>💡 Explicación:</strong> ${escapeHtml(q.explicacion)}</div>`;
       }
 
       content += `</div>`;

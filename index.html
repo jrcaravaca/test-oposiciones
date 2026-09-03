@@ -130,12 +130,6 @@
         <!-- Generado dinámicamente mediante JS -->
       </div>
 
-      <!-- Cuadro de Explicación de la Respuesta -->
-      <div id="explanation-box" class="explanation-box">
-        <div class="explanation-title">💡 Explicación del artículo / norma:</div>
-        <p id="explanation-text" class="explanation-text"></p>
-      </div>
-
       <!-- Acciones (Botón Siguiente) -->
       <div class="test-actions">
         <button id="btn-next-question" class="btn btn-primary btn-next">
@@ -208,8 +202,14 @@
     <p>PrepOpos &bull; Aplicación Ligera para Estudio de Oposiciones &bull; Sin Backend</p>
   </footer>
 
-  <!-- Carga de Scripts JS (Primero los datos, después la lógica de la app) -->
+  <!-- Carga de Scripts JS (Primero el registro, luego los archivos de cada tema, y finalmente la app) -->
   <script src="preguntas.js"></script>
+  
+  <!-- Temas de preguntas (Añade aquí un script por cada nuevo tema) -->
+  <script src="preguntas/tema13.js"></script>
+  <!-- <script src="preguntas/tema01.js"></script> -->
+  <!-- <script src="preguntas/tema02.js"></script> -->
+
   <script src="app.js"></script>
 </body>
 </html>
